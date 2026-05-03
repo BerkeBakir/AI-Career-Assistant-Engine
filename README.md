@@ -1,72 +1,36 @@
-# Yapay Zeka Destekli İş Arama ve CV Analiz Asistanı
+# AI Career Assistant Engine 🚀
 
-Bu proje, iş arama sürecini otomatize eden, adayların özgeçmişlerini (CV) analiz ederek internetteki en uygun iş ilanlarını bulan ve bu ilanları Yapay Zeka ile skorlayan akıllı bir web uygulamasıdır.
+An intelligent, full-stack career platform that automates the job search lifecycle. By leveraging **Generative AI (Google Gemini)** and advanced web scraping, this application transforms how candidates find and apply for jobs—moving from manual searching to AI-driven "point-and-click" matching.
 
-## Proje Hakkında
+## 🏛️ System Architecture
+The platform is built on a modular **Flask** backend with a focus on high-performance parallel processing and sophisticated AI integration.
 
-Geleneksel iş arama yöntemlerinde adaylar binlerce ilanı manuel olarak taramak ve okumak zorundadır. Bu proje, **"Kişisel İK Asistanı"** mantığıyla çalışarak bu süreci tersine çevirir. 
+### Core Engineering Features:
+- **AI-Powered CV Parsing:** Uses **Google Gemini LLM** to perform Named Entity Recognition (NER) on PDF/DOCX files, extracting structured JSON data (Skills, Experience, Education) with high accuracy.
+- **Distributed Meta-Search Engine:** Implements a concurrent search architecture using `ThreadPoolExecutor` to scrape and aggregate job listings from LinkedIn, Indeed, and local sources via DuckDuckGo and specialized scrapers.[cite: 6, 10]
+- **Semantic Match Scoring:** Beyond keyword matching, the engine performs a deep semantic analysis of job descriptions vs. CV data, generating a 0-100 suitability score across five dimensions (Technical, Experience, Education, Language, and Certifications).[cite: 6, 16]
+- **Automated Cover Letter Generation:** Generates professional, HTML-formatted cover letters tailored specifically to each job listing and candidate profile.[cite: 6, 19]
+- **Parallel Analysis Pipeline:** Features a bulk analysis mode that processes multiple job listings simultaneously using thread-pool synchronization to minimize API latency.[cite: 1, 16]
 
-Sistem şu üç temel sorunu çözer:
-1.  **CV Analizi:** Yüklenen PDF/DOCX dosyalarından yetenekleri ve deneyimleri otomatik ayrıştırır.
-2.  **Otomatik Arama:** Adayın yeteneklerine uygun iş ilanlarını LinkedIn, Indeed ve yerel kaynaklardan (Kariyer.net vb.) otomatik olarak toplar.
-3.  **Akıllı Eşleşme:** Bulunan ilanı ve adayın CV'sini anlamsal olarak karşılaştırır, 0-100 arası bir uyum puanı ve geliştirme tavsiyeleri verir.
+## ✨ Key Features
+- **Interactive Dashboard:** Real-time statistics tracking for job listings and CVs.[cite: 1, 20]
+- **Smart Analytics:** Radar chart visualizations (Chart.js) comparing candidate profiles against "Ideal Candidate" benchmarks.[cite: 12, 16]
+- **Admin Control Center:** Comprehensive management of system logs, user settings, and global AI model configurations.[cite: 1]
+- **Security & Validation:** Implements CSRF protection, secure password hashing (Werkzeug), and strict file validation.[cite: 1]
 
-## Özellikler
+## 🛠️ Tech Stack
+- **Backend:** Python 3.x, Flask (Web Framework)[cite: 1]
+- **AI/LLM:** Google Gemini API (Generative AI)[cite: 6, 9]
+- **Database:** SQLite with SQLAlchemy ORM[cite: 1, 8]
+- **Scraping:** BeautifulSoup4, DuckDuckGo Search (DDGS), Requests
+- **File Processing:** PyMuPDF (PDF), python-docx (DOCX)
+- **Frontend:** HTML5, CSS3 (Modern UI Kit), Bootstrap 5, Chart.js[cite: 12]
 
-*** CV Parsing (Ayrıştırma):** PDF ve Word dosyalarını okuyarak yetenek, deneyim ve eğitim bilgilerini yapısal veriye (JSON) dönüştürür.
-*** Meta-Search Motoru:** DuckDuckGo ve Scraping algoritmaları ile birden fazla kaynaktan eş zamanlı iş ilanı taraması yapar.
-*** AI Tabanlı Skorlama:** Google Gemini (LLM) kullanarak ilanı ve CV'yi analiz eder; "Teknik", "Deneyim" ve "Eğitim" bazlı detaylı puanlama yapar.
-*** Paralel İşleme:** Çoklu ilan analizlerinde performans kaybını önlemek için ThreadPool mimarisi kullanır.
-*** Kullanıcı Paneli:** Bulunan ilanların listelendiği, analiz edildiği ve filtrelendiği yönetim paneli.
-
-## Kullanılan Teknolojiler
-
-* **Backend:** Python 3.x, Flask
-* **Veritabanı:** SQLite, SQLAlchemy ORM
-* **Yapay Zeka:** Google Gemini API (Generative AI)
-* **Veri Kazıma:** BeautifulSoup4, DuckDuckGo Search, Requests
-* **Dosya İşleme:** PyMuPDF (PDF), python-docx (DOCX)
-* **Frontend:** HTML5, CSS3, Bootstrap 5
-
-## Kurulum ve Çalıştırma
-
-Projeyi yerel makinenizde çalıştırmak için aşağıdaki adımları izleyin:
-```
-### 1. Projeyi Klonlayın
-``` bash
-git clone https://github.com/BerkeBey01/Akilli-is-bulma-asistani.git
+## 📂 Installation & Execution
+### 1. Clone & Setup Environment
+```bash
+git clone [https://github.com/BerkeBey01/Akilli-is-bulma-asistani.git](https://github.com/BerkeBey01/Akilli-is-bulma-asistani.git)
 cd Akilli-is-bulma-asistani
-
-### 2. Sanal Ortam (Virtual Environment) Oluşturun
-# Windows için
 python -m venv venv
-venv\Scripts\activate
-
-# Mac/Linux için
-python3 -m venv venv
-source venv/bin/activate
-
-### 3. Gerekli Kütüphaneleri Yükleyin
+source venv/bin/activate # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
-
-### 4. Ortam Değişkenlerini (.env) Ayarlayın
-GEMINI_API_KEY=AIzaSyDxxxxxxxxx...
-SECRET_KEY=gizli-anahtarim
-FLASK_DEBUG=True
-
-### 5. Uygulamayı Başlatın
-python app.py
-
-Tarayıcınızda http://127.0.0.1:5000 adresine giderek uygulamayı kullanabilirsiniz.
-
-
-Nasıl Kullanılır?
-Kayıt Ol: Sisteme e-posta ve şifrenizle kayıt olun.
-
-CV Yükle: "CV İşlemleri" menüsünden güncel özgeçmişinizi (PDF/DOCX) yükleyin.
-
-İş Ara: "İş Ara" menüsüne gelin, yüklediğiniz CV'yi seçin ve "İş Ara" butonuna basın.
-
-Analiz Et: "Kaydedilenler" sayfasında bulunan ilanları görüntüleyin. "Analiz Et" butonuna basarak Yapay Zekanın sizin için oluşturduğu uyumluluk raporunu inceleyin.
-```
-Bu proje, İskenderun Teknik Üniversitesi (İSTE), Bilgisayar Mühendisliği Bölümü, 2024-2025 Eğitim-Öğretim Yılı Mühendislikte Bilgisayar Uygulamaları dersi kapsamında geliştirilmiştir.
