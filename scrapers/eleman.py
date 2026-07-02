@@ -54,7 +54,7 @@ class ElemanScraper(BaseScraper):
                 if parts:
                     company = parts[0]
                 if len(parts) > 1:
-                    location = parts[1]
+                    location = " - ".join(parts[1:])
 
             results.append(JobListing(
                 title=title,

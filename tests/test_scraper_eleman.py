@@ -30,7 +30,7 @@ def test_eleman_splits_company_and_location_from_subtitle(mock_get):
     results = ElemanScraper().search(["yazılım"], limit=10)
     r = results[0]
     assert r.company == "Acme Yazılım A.Ş."
-    assert "İstanbul Anadolu" in r.location
+    assert r.location == "İstanbul Anadolu - Kartal"
 
 
 @patch("scrapers.eleman.requests.get")
@@ -39,6 +39,7 @@ def test_eleman_matches_second_listing_by_keyword(mock_get):
     results = ElemanScraper().search(["frontend"], limit=10)
     assert len(results) == 1
     assert results[0].company == "Beta Teknoloji Ltd."
+    assert results[0].location == "Ankara - Çankaya"
 
 
 @patch("scrapers.eleman.requests.get")
