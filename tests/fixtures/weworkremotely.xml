@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss">
+  <channel>
+    <title>We Work Remotely: Remote jobs in design, programming, marketing and more</title>
+    <link>https://weworkremotely.com/categories/remote-programming-jobs.rss</link>
+    <description>We Work Remotely: Remote jobs</description>
+    <language>en-US</language>
+    <ttl>60</ttl>
+    <item>
+      <title>Acme Corp: Senior Python Developer</title>
+      <region>Anywhere</region>
+      <category>Back-End Programming</category>
+      <description>&lt;p&gt;We need a senior Python developer to join our remote team.&lt;/p&gt;</description>
+      <link>https://weworkremotely.com/remote-jobs/acme-corp-senior-python-developer</link>
+      <pubDate>Mon, 01 Jun 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="false">acme-corp-senior-python-developer</guid>
+    </item>
+    <item>
+      <title>Beta Inc: React Frontend Engineer</title>
+      <region>Europe</region>
+      <category>Front-End Programming</category>
+      <description>&lt;p&gt;Looking for a React frontend engineer, fully remote.&lt;/p&gt;</description>
+      <link>https://weworkremotely.com/remote-jobs/beta-inc-react-frontend-engineer</link>
+      <pubDate>Mon, 01 Jun 2026 01:00:00 +0000</pubDate>
+      <guid isPermaLink="false">beta-inc-react-frontend-engineer</guid>
+    </item>
+  </channel>
+</rss>

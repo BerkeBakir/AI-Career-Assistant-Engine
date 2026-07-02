@@ -20,7 +20,9 @@ Mevcut durumun sorunları:
 
 - **RemoteOK API** (`remoteok.com/api`) — 200 OK, key gerektirmiyor, temiz JSON.
 - **WeWorkRemotely RSS** (`weworkremotely.com/categories/remote-programming-jobs.rss`) — 200 OK, temiz XML.
-- **Eleman.net, Yenibiris.com, SecretCV.com** — hepsi 200 OK, gerçek CSS selector'larla scrape edilebilir (`jobTitleLnk`/`jobCompanyLnk` — Yenibiris, `map-job-card` — Eleman, ilan listeleme sayfası çalışıyor — SecretCV).
+- **Yenibiris.com** — 200 OK, gerçek ve herkese açık selector: `div[data-ad-id] a.gtmTitle` (başlık+link) eşleştirilmiş `div.jobCompanyLnk[data-ad-id=...]` (şirket).
+- **Eleman.net** — 200 OK; ilk varsayımım (`.map-job-card`, harita görünümü) yanlış çıktı — o sadece JS ile doldurulan bir harita şablonu. Gerçek, herkese açık ilanlar `a[href*="/is-ilani/"]` altında `h3.c-showcase-box__title` (başlık) + `span.c-showcase-box__subtitle` (şirket - konum) olarak duruyor.
+- **SecretCV.com** — 200 OK ama ilan kartlarındaki başlık/şirket linkleri `href="#"` (JS ile açılıyor), gerçek "İşe Başvur" linki `giris-yap` (login) sayfasına yönleniyor. Yani anonim/girişsiz scraping ile sadece kart üzerindeki başlık/şirket/konum metnini alabiliriz ama **ilan detay sayfasına gerçek bir URL'imiz olmuyor** — bu da sonradan `url_den_ilan_cek` ile tam metin çekmeyi (ve dolayısıyla AI eşleştirme doğruluğunu) imkansız kılar. Bu yüzden SecretCV'yi de Kariyer.net gibi dürüst bir fallback'e (DuckDuckGo discovery) alıyorum, sahte bir "gerçek scraper" gibi göstermek yerine.
 - **Kariyer.net** — PerimeterX bot koruması (CAPTCHA duvarı), browser User-Agent ile bile 403. Bypass etmek CAPTCHA-solving/proxy gerektirir — bu kapsam dışı (anti-bot sistemini atlatmak, scraping bug'ı düzeltmek değil). DuckDuckGo discovery fallback olarak kalır, README'de bu sınırlama açıkça belirtilir.
 - **Adzuna** — Türkiye'yi desteklemiyor (12 ülke: GB/US/DE/FR/AU/NZ/CA/IN/PL/BR/AT/ZA, TR yok) — eklenmeyecek.
 - **Jooble** — ücretsiz API key ile global arama (Türkiye dahil, location parametresiyle) — opsiyonel kaynak.
@@ -35,8 +37,8 @@ scrapers/
   linkedin.py, indeed.py, bing.py                          # sağlamlaştırılmış, mevcut
   arbeitnow.py, remotive.py, himalayas.py, findwork.py     # mevcut, aynen taşınır
   remoteok.py, weworkremotely.py                            # yeni
-  eleman.py, yenibiris.py, secretcv.py                      # yeni, gerçek scraper
-  kariyer_ddg.py                                            # DuckDuckGo fallback, açıkça belgelenmiş sınırlama
+  eleman.py, yenibiris.py                                   # yeni, gerçek scraper
+  ddg_fallback.py                                            # DuckDuckGo discovery: Kariyer.net + SecretCV.com + diğerleri, açıkça belgelenmiş sınırlama
   jooble.py                                                 # opsiyonel, JOOBLE_API_KEY varsa aktif
   registry.py                                                # aktif scraper listesi
 job_search_service.py                                        # orchestration
@@ -55,8 +57,8 @@ Her scraper: `name`, `search(keywords: list[str], limit: int) -> list[JobListing
 
 ### 3. Yeni/sağlamlaştırılmış kaynaklar
 
-**Yeni:** RemoteOK, WeWorkRemotely (key yok), Eleman.net/Yenibiris.com/SecretCV.com (gerçek scraper), Jooble (opsiyonel key).
-**Kariyer.net:** DuckDuckGo discovery fallback olarak kalır, README'de dürüstçe belirtilir.
+**Yeni:** RemoteOK, WeWorkRemotely (key yok), Eleman.net/Yenibiris.com (gerçek scraper), Jooble (opsiyonel key).
+**Kariyer.net + SecretCV.com:** DuckDuckGo discovery fallback olarak kalır (`ddg_fallback.py`), README'de dürüstçe belirtilir.
 **Sağlamlaştırma (LinkedIn/Indeed/Bing):** UA havuzundan rotasyon, timeout/5xx'te retry-with-backoff (2 deneme), implementasyon sırasında canlı selector doğrulaması.
 
 ### 4. Eşleştirme doğruluğu — deterministik + LLM hibrit

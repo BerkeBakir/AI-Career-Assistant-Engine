@@ -1,0 +1,33 @@
+[
+  {"legal": "API Terms of Service notice, not a job"},
+  {
+    "slug": "remote-python-developer-acme-1134360",
+    "id": "1134360",
+    "epoch": 1782000000,
+    "date": "2026-06-01T00:00:00+00:00",
+    "company": "Acme Corp",
+    "position": "Python Developer",
+    "tags": ["python", "backend", "dev"],
+    "description": "We are looking for a remote Python developer...",
+    "location": "Worldwide",
+    "apply_url": "https://remoteok.com/remote-jobs/remote-python-developer-acme-1134360/apply",
+    "salary_min": 60000,
+    "salary_max": 90000,
+    "url": "https://remoteOK.com/remote-jobs/remote-python-developer-acme-1134360"
+  },
+  {
+    "slug": "remote-react-engineer-beta-1134361",
+    "id": "1134361",
+    "epoch": 1782000100,
+    "date": "2026-06-01T01:00:00+00:00",
+    "company": "Beta Inc",
+    "position": "React Engineer",
+    "tags": ["react", "javascript", "frontend"],
+    "description": "Join our team as a remote React engineer...",
+    "location": "Europe",
+    "apply_url": "https://remoteok.com/remote-jobs/remote-react-engineer-beta-1134361/apply",
+    "salary_min": 50000,
+    "salary_max": 80000,
+    "url": "https://remoteOK.com/remote-jobs/remote-react-engineer-beta-1134361"
+  }
+]
