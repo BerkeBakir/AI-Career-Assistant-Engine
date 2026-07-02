@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import functions
 from extensions import db
 import models
+import job_search_service
 
 # .env dosyasini yukle
 load_dotenv()
@@ -219,7 +220,7 @@ def is_ara_sayfasi():
         cv = models.CV.query.get(request.form.get('secilen_cv_id'))
         if cv and cv.aday_id == user_id:
             try:
-                sonuclar, err = functions.internette_is_ara(cv.cikarilan_veriler.get('yetenekler', []))
+                sonuclar = job_search_service.search_jobs(cv.cikarilan_veriler.get('yetenekler', []))
                 if sonuclar:
                     eklenen = 0
                     for ilan in sonuclar:
