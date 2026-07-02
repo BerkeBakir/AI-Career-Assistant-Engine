@@ -1107,6 +1107,8 @@ Create `tests/test_http_utils.py`:
 ```python
 from unittest.mock import patch, MagicMock
 
+import requests
+
 from scrapers.http_utils import get_with_retry, USER_AGENTS
 
 
@@ -1137,7 +1139,7 @@ def test_get_with_retry_retries_once_on_5xx_then_succeeds(mock_get, mock_sleep):
 @patch("scrapers.http_utils.time.sleep", return_value=None)
 @patch("scrapers.http_utils.requests.get")
 def test_get_with_retry_returns_none_after_exhausting_attempts(mock_get, mock_sleep):
-    mock_get.side_effect = ConnectionError("boom")
+    mock_get.side_effect = requests.exceptions.ConnectionError("boom")
     result = get_with_retry("https://example.com", attempts=2)
     assert result is None
     assert mock_get.call_count == 2
