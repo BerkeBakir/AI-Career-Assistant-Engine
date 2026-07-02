@@ -1,0 +1,6 @@
+{
+  "jobs": [
+    {"title": "Python Engineer", "companyName": "Acme Himalayas", "applicationLink": "https://himalayas.app/jobs/python-engineer-1", "slug": "python-engineer-1", "locationRestrictions": "Worldwide"},
+    {"title": "Sales Representative", "companyName": "Delta Himalayas", "applicationLink": "https://himalayas.app/jobs/sales-representative-2", "slug": "sales-representative-2", "locationRestrictions": "USA"}
+  ]
+}

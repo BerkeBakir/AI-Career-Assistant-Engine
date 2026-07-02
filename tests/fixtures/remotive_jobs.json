@@ -1,0 +1,6 @@
+{
+  "jobs": [
+    {"title": "Python Developer", "company_name": "Acme Co", "url": "https://remotive.com/remote-jobs/software-dev/python-developer-1", "candidate_required_location": "Worldwide"},
+    {"title": "Marketing Manager", "company_name": "Gamma Co", "url": "https://remotive.com/remote-jobs/marketing/marketing-manager-2", "candidate_required_location": "USA"}
+  ]
+}

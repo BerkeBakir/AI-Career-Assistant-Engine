@@ -1,0 +1,6 @@
+{
+  "data": [
+    {"title": "Python Backend Developer", "company_name": "Acme Remote", "url": "https://www.arbeitnow.com/jobs/companies/acme/python-backend-developer-1", "location": "Remote", "tags": ["python", "backend"]},
+    {"title": "React Frontend Developer", "company_name": "Beta Remote", "url": "https://www.arbeitnow.com/jobs/companies/beta/react-frontend-developer-2", "location": "Remote", "tags": ["react", "frontend"]}
+  ]
+}

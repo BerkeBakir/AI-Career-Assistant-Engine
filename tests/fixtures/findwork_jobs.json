@@ -1,0 +1,6 @@
+{
+  "results": [
+    {"role": "Python Developer", "company_name": "Acme FindWork", "url": "https://findwork.dev/jobs/python-developer-1", "location": "Remote", "keywords": ["python", "django"]},
+    {"role": "UX Designer", "company_name": "Epsilon FindWork", "url": "https://findwork.dev/jobs/ux-designer-2", "location": "Remote", "keywords": ["figma", "design"]}
+  ]
+}
