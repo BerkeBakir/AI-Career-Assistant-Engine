@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
+import requests
+
 from scrapers.remoteok import RemoteOkScraper
 
 FIXTURE = Path(__file__).parent / "fixtures" / "remoteok_jobs.json"
@@ -42,5 +44,5 @@ def test_remoteok_returns_empty_list_on_non_200(mock_get):
 
 @patch("scrapers.remoteok.requests.get")
 def test_remoteok_returns_empty_list_on_exception(mock_get):
-    mock_get.side_effect = ConnectionError("boom")
+    mock_get.side_effect = requests.exceptions.ConnectionError("boom")
     assert RemoteOkScraper().search(["python"]) == []

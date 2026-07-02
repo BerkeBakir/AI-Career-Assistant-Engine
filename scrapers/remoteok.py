@@ -16,7 +16,7 @@ class RemoteOkScraper(BaseScraper):
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
         try:
             resp = requests.get(self.API_URL, headers=headers, timeout=self.TIMEOUT)
-        except Exception as e:
+        except requests.RequestException as e:
             logger.warning(f"RemoteOK istegi basarisiz: {e}")
             return []
 
