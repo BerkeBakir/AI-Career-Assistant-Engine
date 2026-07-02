@@ -9,6 +9,11 @@ logger = logging.getLogger(__name__)
 PER_SCRAPER_TIMEOUT = 12
 
 
+# Returns up to 3 cleaned skills, but only the JSON-API/feed scrapers (Arbeitnow,
+# Remotive, Himalayas, FindWork.dev, RemoteOK, WeWorkRemotely) filter their fetched
+# feed against all 3. The HTML/search-based scrapers (LinkedIn, Indeed, Bing,
+# Eleman.net, Yenibiris.com, Jooble, DDG fallback) query using only the primary
+# (first) keyword, matching their original single-query-string design.
 def _extract_keywords(yetenekler_listesi: list[str]) -> list[str]:
     if not yetenekler_listesi:
         return ["Yazılım"]

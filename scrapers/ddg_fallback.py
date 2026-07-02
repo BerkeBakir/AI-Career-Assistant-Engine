@@ -25,9 +25,6 @@ SITE_QUERIES = [
     'site:kariyer.net "{q}" iş ilanı',
     'site:secretcv.com "{q}"',
     'site:glassdoor.com "{q}" turkey OR türkiye',
-    'site:boards.greenhouse.io "{q}"',
-    'site:jobs.lever.co "{q}"',
-    'site:wellfound.com "{q}"',
 ]
 
 
@@ -48,7 +45,7 @@ class DdgFallbackScraper(BaseScraper):
         try:
             with DDGS() as ddgs:
                 for query_template in SITE_QUERIES:
-                    time.sleep(0.8)
+                    time.sleep(0.5)
                     query = query_template.format(q=query_term)
                     try:
                         hits = ddgs.text(query, region="tr-tr", max_results=10, backend="lite")
