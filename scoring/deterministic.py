@@ -109,3 +109,72 @@ def deneyim_puani_hesapla(is_deneyimleri, min_deneyim_yili):
     puan = round(min(100, (toplam_yil / min_deneyim_yili) * 100))
     uyum = f"{toplam_yil:.1f} yıl deneyim (istenen: {min_deneyim_yili} yıl)"
     return puan, uyum
+
+
+DIL_SEVIYE_SIRASI = {
+    "başlangıç": 1, "baslangic": 1, "temel": 1,
+    "orta": 2,
+    "ileri": 3, "i̇leri": 3,
+    "ana dil": 4, "anadil": 4, "native": 4, "fluent": 4, "akıcı": 4, "akici": 4,
+}
+
+
+def _seviye_numarasi(seviye_metni):
+    if not seviye_metni:
+        return 0
+    return DIL_SEVIYE_SIRASI.get(seviye_metni.strip().lower(), 0)
+
+
+def dil_puani_hesapla(yabanci_diller, dil_gereksinimleri):
+    if not dil_gereksinimleri:
+        return 100, "Dil gereksinimi belirtilmemiş"
+
+    aday_dilleri = {
+        d.get('dil', '').strip().lower(): _seviye_numarasi(d.get('seviye'))
+        for d in (yabanci_diller or [])
+    }
+
+    puanlar = []
+    uyum_parcalari = []
+    for gereksinim in dil_gereksinimleri:
+        gereken_dil = gereksinim.get('dil', '').strip().lower()
+        gereken_seviye = _seviye_numarasi(gereksinim.get('min_seviye'))
+        aday_seviye = aday_dilleri.get(gereken_dil, 0)
+
+        if aday_seviye == 0:
+            puan = 0
+        elif aday_seviye >= gereken_seviye:
+            puan = 100
+        elif aday_seviye == gereken_seviye - 1:
+            puan = 65
+        else:
+            puan = 35
+
+        puanlar.append(puan)
+        uyum_parcalari.append(f"{gereksinim.get('dil', '?')}: {puan}")
+
+    ortalama = round(sum(puanlar) / len(puanlar))
+    return ortalama, ", ".join(uyum_parcalari)
+
+
+def sertifika_puani_hesapla(sertifikalar, projeler, sertifika_gereksinimleri):
+    sertifikalar = sertifikalar or []
+    aday_sertifika_adlari = [s.get('sertifika_adi', '').strip().lower() for s in sertifikalar]
+
+    if sertifika_gereksinimleri:
+        eslesen_sayisi = 0
+        for gereken in sertifika_gereksinimleri:
+            gereken_kucuk = gereken.strip().lower()
+            if any(
+                gereken_kucuk in aday or aday in gereken_kucuk
+                for aday in aday_sertifika_adlari if aday
+            ):
+                eslesen_sayisi += 1
+        puan = (eslesen_sayisi / len(sertifika_gereksinimleri)) * 80 + 20
+    else:
+        puan = 40 + min(40, len(sertifikalar) * 10)
+
+    if projeler:
+        puan += 20
+
+    return round(min(100, max(0, puan)))

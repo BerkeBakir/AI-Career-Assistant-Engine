@@ -112,3 +112,58 @@ def test_deneyim_puani_parse_edilemeyen_kayit_atlanir():
     is_deneyimleri = [{"baslangic_tarihi": "bilinmiyor", "bitis_tarihi": "bilinmiyor"}]
     puan, uyum = deneyim_puani_hesapla(is_deneyimleri, 3)
     assert puan == 0
+
+
+from scoring.deterministic import dil_puani_hesapla, sertifika_puani_hesapla
+
+
+def test_dil_puani_gereksinim_yoksa_yuz_doner():
+    puan, uyum = dil_puani_hesapla([{"dil": "İngilizce", "seviye": "Orta"}], [])
+    assert puan == 100
+
+
+def test_dil_puani_tam_uyum():
+    aday = [{"dil": "İngilizce", "seviye": "İleri"}]
+    gereksinim = [{"dil": "İngilizce", "min_seviye": "İleri"}]
+    puan, uyum = dil_puani_hesapla(aday, gereksinim)
+    assert puan == 100
+
+
+def test_dil_puani_bir_seviye_dusuk():
+    aday = [{"dil": "İngilizce", "seviye": "Orta"}]
+    gereksinim = [{"dil": "İngilizce", "min_seviye": "İleri"}]
+    puan, uyum = dil_puani_hesapla(aday, gereksinim)
+    assert puan == 65
+
+
+def test_dil_puani_iki_seviye_dusuk():
+    aday = [{"dil": "İngilizce", "seviye": "Başlangıç"}]
+    gereksinim = [{"dil": "İngilizce", "min_seviye": "Ana dil"}]
+    puan, uyum = dil_puani_hesapla(aday, gereksinim)
+    assert puan == 35
+
+
+def test_dil_puani_dil_yoksa_sifir():
+    puan, uyum = dil_puani_hesapla([], [{"dil": "Almanca", "min_seviye": "Orta"}])
+    assert puan == 0
+
+
+def test_sertifika_puani_gereksinim_yoksa_sayima_gore():
+    puan = sertifika_puani_hesapla([{"sertifika_adi": "AWS"}, {"sertifika_adi": "Azure"}], [], [])
+    assert puan == 60
+
+
+def test_sertifika_puani_proje_bonusu():
+    puan = sertifika_puani_hesapla([], [{"proje_adi": "X"}], [])
+    assert puan == 60
+
+
+def test_sertifika_puani_gereksinim_eslesirse():
+    sertifikalar = [{"sertifika_adi": "AWS Certified Solutions Architect"}]
+    puan = sertifika_puani_hesapla(sertifikalar, [], ["AWS"])
+    assert puan == 100
+
+
+def test_sertifika_puani_hicbiri_yoksa_baseline():
+    puan = sertifika_puani_hesapla([], [], [])
+    assert puan == 40
