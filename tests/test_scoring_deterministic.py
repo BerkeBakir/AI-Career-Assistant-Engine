@@ -51,3 +51,59 @@ def test_teknik_puani_gomme_basarisiz_olursa_eksige_dusuyor():
     puan, eslesen, eksik = teknik_puani_hesapla(["Python"], ["React"], lambda t: None)
     assert puan == 0
     assert eksik == ["React"]
+
+
+from datetime import datetime, timedelta
+
+from scoring.deterministic import deneyim_puani_hesapla, _tarihi_parse_et
+
+
+def test_tarihi_parse_et_turkce_ay_ismi():
+    assert _tarihi_parse_et("Ocak 2020") == datetime(2020, 1, 1)
+
+
+def test_tarihi_parse_et_halen_bugunu_dondurur():
+    sonuc = _tarihi_parse_et("Halen")
+    assert (datetime.now() - sonuc).total_seconds() < 5
+
+
+def test_tarihi_parse_et_sadece_yil():
+    assert _tarihi_parse_et("2019") == datetime(2019, 1, 1)
+
+
+def test_tarihi_parse_et_sayisal_ay_yil():
+    assert _tarihi_parse_et("03/2021") == datetime(2021, 3, 1)
+
+
+def test_tarihi_parse_et_parse_edilemeyen_metin_none_doner():
+    assert _tarihi_parse_et("bilinmiyor") is None
+
+
+def test_deneyim_puani_min_deneyim_belirtilmemisse_elli_doner():
+    puan, uyum = deneyim_puani_hesapla([], None)
+    assert puan == 50
+
+
+def test_deneyim_puani_tam_uyum():
+    is_deneyimleri = [{"baslangic_tarihi": "Ocak 2020", "bitis_tarihi": "Ocak 2023"}]
+    puan, uyum = deneyim_puani_hesapla(is_deneyimleri, 3)
+    assert puan == 100
+
+
+def test_deneyim_puani_eksik_deneyim():
+    is_deneyimleri = [{"baslangic_tarihi": "Ocak 2022", "bitis_tarihi": "Ocak 2023"}]
+    puan, uyum = deneyim_puani_hesapla(is_deneyimleri, 5)
+    assert puan == 20
+
+
+def test_deneyim_puani_halen_devam_eden_is():
+    uc_yil_once = (datetime.now() - timedelta(days=3 * 365)).strftime("%m/%Y")
+    is_deneyimleri = [{"baslangic_tarihi": uc_yil_once, "bitis_tarihi": "Halen"}]
+    puan, uyum = deneyim_puani_hesapla(is_deneyimleri, 3)
+    assert puan >= 95
+
+
+def test_deneyim_puani_parse_edilemeyen_kayit_atlanir():
+    is_deneyimleri = [{"baslangic_tarihi": "bilinmiyor", "bitis_tarihi": "bilinmiyor"}]
+    puan, uyum = deneyim_puani_hesapla(is_deneyimleri, 3)
+    assert puan == 0
