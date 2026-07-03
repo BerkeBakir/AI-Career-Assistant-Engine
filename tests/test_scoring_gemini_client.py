@@ -70,3 +70,28 @@ def test_gereksinimleri_cikar_propagates_error(mock_istek):
     )
     assert sonuc is None
     assert hata == "API hatası"
+
+
+@patch("scoring.gemini_client._gemini_istegi_gonder")
+def test_egitim_ve_anlatim_uret_returns_full_narrative(mock_istek):
+    mock_istek.return_value = ({
+        "egitim_puan": 85,
+        "egitim_uyumu": "İlgili bölüm mezunu",
+        "uygunluk_nedeni": "Aday teknik olarak güçlü",
+        "guclu_yonler": ["Python bilgisi"],
+        "gelistirilmesi_gerekenler": ["Bulut deneyimi"],
+        "tavsiyeler": ["AWS sertifikası al"],
+    }, None)
+
+    cv_verisi = {"egitim_bilgileri": [{"bolum_adi": "Bilgisayar Mühendisliği"}]}
+    gereksinimler = {"egitim_gereksinimi": "Bilgisayar Mühendisliği"}
+    alt_puanlar = {"teknik": 80, "deneyim": 70, "dil": 100, "sertifika": 60}
+
+    sonuc, hata = gemini_client.egitim_ve_anlatim_uret(
+        cv_verisi, gereksinimler, alt_puanlar, ["Python"], ["AWS"], "3 yıl", "İngilizce: 100"
+    )
+
+    assert hata is None
+    assert sonuc["egitim_puan"] == 85
+    assert sonuc["guclu_yonler"] == ["Python bilgisi"]
+    mock_istek.assert_called_once()
