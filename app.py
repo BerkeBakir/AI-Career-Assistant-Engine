@@ -12,6 +12,7 @@ import functions
 from extensions import db
 import models
 import job_search_service
+import scoring.hybrid_scorer
 
 # .env dosyasini yukle
 load_dotenv()
@@ -288,7 +289,7 @@ def tekil_analiz(ilan_id, cv_id):
             ilan.gereksinimler_json = {"full_text": metin}
             db.session.commit()
 
-        sonuc, err = functions.ilani_karsilastir(cv.cikarilan_veriler, metin)
+        sonuc, err = scoring.hybrid_scorer.ilani_karsilastir_hibrit(cv.cikarilan_veriler, metin)
         if not err:
             eslesme = models.Eslesme.query.filter_by(cv_id=cv.id, is_ilani_id=ilan.id).first()
             if not eslesme:
@@ -324,7 +325,7 @@ def _tek_ilan_analiz_et(ilan_id, cv_id, cv_verisi, user_id):
                 db.session.commit()
             
             # AI analizi yap
-            sonuc, err = functions.ilani_karsilastir(cv_verisi, metin)
+            sonuc, err = scoring.hybrid_scorer.ilani_karsilastir_hibrit(cv_verisi, metin)
             if err:
                 return {'ilan_id': ilan_id, 'success': False, 'error': err}
             
