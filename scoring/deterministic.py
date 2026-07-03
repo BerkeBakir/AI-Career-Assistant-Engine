@@ -82,7 +82,7 @@ def _tarihi_parse_et(tarih_metni):
         if 1 <= ay <= 12:
             return datetime(yil, ay, 1)
 
-    eslesme = re.search(r"\b(\d{4})\b", metin)
+    eslesme = re.fullmatch(r"\s*(\d{4})\s*", metin)
     if eslesme:
         return datetime(int(eslesme.group(1)), 1, 1)
 

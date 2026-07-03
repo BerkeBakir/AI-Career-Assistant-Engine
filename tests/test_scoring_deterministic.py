@@ -71,6 +71,11 @@ def test_tarihi_parse_et_sadece_yil():
     assert _tarihi_parse_et("2019") == datetime(2019, 1, 1)
 
 
+def test_tarihi_parse_et_gomulu_yil_false_positive_reddedilir():
+    assert _tarihi_parse_et("ID-2020-45123") is None
+    assert _tarihi_parse_et("2020-2023") is None
+
+
 def test_tarihi_parse_et_sayisal_ay_yil():
     assert _tarihi_parse_et("03/2021") == datetime(2021, 3, 1)
 
