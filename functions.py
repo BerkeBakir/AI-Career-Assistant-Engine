@@ -5,7 +5,7 @@ import json
 import requests
 import re
 import logging
-from bs4 import BeautifulSoup
+import trafilatura
 from dotenv import load_dotenv
 
 # .env dosyasini yukle
@@ -131,17 +131,14 @@ def bilgileri_cikar(metin):
 def url_den_ilan_cek(url):
     try:
         if not url.startswith('http'): url = 'https://' + url
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(url, headers=headers, timeout=10)
-        
-        if response.status_code != 200: return None, "Siteye erişilemedi."
+        indirilen = trafilatura.fetch_url(url)
+        if not indirilen:
+            return None, "Siteye erişilemedi."
 
-        soup = BeautifulSoup(response.content, 'html.parser')
-        for script in soup(["script", "style", "nav", "footer", "header", "aside"]): script.decompose()
-        
-        metin = soup.get_text(separator=' ', strip=True)[:15000]
-        if len(metin) < 100: return None, "İçerik boş."
-        return metin, None
+        metin = trafilatura.extract(indirilen)
+        if not metin or len(metin) < 100:
+            return None, "İçerik boş."
+        return metin[:15000], None
     except Exception as e:
         return None, str(e)
 

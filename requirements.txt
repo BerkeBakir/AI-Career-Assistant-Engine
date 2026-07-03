@@ -16,3 +16,6 @@ requests>=2.31.0
 beautifulsoup4>=4.12.0
 lxml>=4.9.0
 duckduckgo-search>=4.0.0
+
+# Metin Cikarma
+trafilatura>=1.6.0
