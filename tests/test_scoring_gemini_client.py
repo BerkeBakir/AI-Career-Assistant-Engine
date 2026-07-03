@@ -34,3 +34,39 @@ def test_gomlemesi_al_returns_none_on_request_exception(mock_post):
 def test_gomlemesi_al_returns_none_for_empty_text():
     assert gemini_client._gemini_gomlemesi_al("") is None
     assert gemini_client._gemini_gomlemesi_al("   ") is None
+
+
+@patch("scoring.gemini_client._gemini_istegi_gonder")
+def test_gereksinimleri_cikar_returns_parsed_requirements(mock_istek):
+    mock_istek.return_value = ({
+        "gereken_yetenekler": ["Python", "Flask"],
+        "min_deneyim_yili": 3,
+        "egitim_gereksinimi": "Bilgisayar Mühendisliği",
+        "dil_gereksinimleri": [{"dil": "İngilizce", "min_seviye": "İleri"}],
+        "sertifika_gereksinimleri": [],
+    }, None)
+
+    sonuc, hata = gemini_client.gereksinimleri_cikar(
+        "Python Flask geliştirici aranıyor, min 3 yıl deneyim gereklidir."
+    )
+
+    assert hata is None
+    assert sonuc["gereken_yetenekler"] == ["Python", "Flask"]
+    mock_istek.assert_called_once()
+
+
+def test_gereksinimleri_cikar_returns_empty_defaults_for_short_text():
+    sonuc, hata = gemini_client.gereksinimleri_cikar("kısa")
+    assert hata is None
+    assert sonuc["gereken_yetenekler"] == []
+    assert sonuc["min_deneyim_yili"] is None
+
+
+@patch("scoring.gemini_client._gemini_istegi_gonder")
+def test_gereksinimleri_cikar_propagates_error(mock_istek):
+    mock_istek.return_value = (None, "API hatası")
+    sonuc, hata = gemini_client.gereksinimleri_cikar(
+        "Python Flask geliştirici aranıyor, min 3 yıl deneyim, uzun metin burada devam ediyor."
+    )
+    assert sonuc is None
+    assert hata == "API hatası"
