@@ -48,3 +48,66 @@ def test_lojistik_regresyon_egit_learns_dominant_feature():
 
     assert abs(agirliklar[0]) > abs(agirliklar[1])
     assert agirliklar[0] > 0
+
+
+from datetime import datetime
+
+from learning.reweighting import yeniden_egit, MIN_TOPLAM_ORNEK
+
+
+def _fixture_kullanici_cv(etiket):
+    user = models.Kullanici(email=f"rw-{etiket}-{datetime.utcnow().timestamp()}@example.com", parola="hashed")
+    db.session.add(user)
+    db.session.commit()
+    cv = models.CV(orjinal_dosya_adi="x.pdf", aday_id=user.id, cikarilan_veriler={})
+    db.session.add(cv)
+    db.session.commit()
+    return user, cv
+
+
+def _geribildirim_ekle(user, cv, alt_puanlar, deger, benzersiz_no):
+    ilan = models.IsIlani(kaynak_url=f"https://example.com/rw-{benzersiz_no}", bulan_kullanici_id=user.id)
+    db.session.add(ilan)
+    db.session.commit()
+    eslesme = models.Eslesme(cv_id=cv.id, is_ilani_id=ilan.id, skor=80, analiz_sonucu={"alt_puanlar": alt_puanlar})
+    db.session.add(eslesme)
+    db.session.commit()
+    gb = models.Geribildirim(eslesme_id=eslesme.id, kullanici_id=user.id, deger=deger)
+    db.session.add(gb)
+    db.session.commit()
+
+
+def test_yeniden_egit_yetersiz_veri_ile_reddeder(client):
+    with flask_app.app_context():
+        user, cv = _fixture_kullanici_cv("az")
+        for i in range(5):
+            _geribildirim_ekle(
+                user, cv, {"teknik": 80, "deneyim": 70, "egitim": 60, "dil": 90, "sertifika": 50}, "olumlu", f"az{i}",
+            )
+
+        sonuc, hata = yeniden_egit()
+
+        assert sonuc is None
+        assert f"Yetersiz veri (5/{MIN_TOPLAM_ORNEK})" == hata
+        assert models.ScoringConfig.query.count() == 0
+
+
+def test_yeniden_egit_yeterli_veri_ile_agirlik_uretir(client):
+    with flask_app.app_context():
+        user, cv = _fixture_kullanici_cv("yeterli")
+        for i in range(25):
+            _geribildirim_ekle(
+                user, cv, {"teknik": 90, "deneyim": 85, "egitim": 80, "dil": 90, "sertifika": 85}, "olumlu", f"pos{i}",
+            )
+        for i in range(25):
+            _geribildirim_ekle(
+                user, cv, {"teknik": 10, "deneyim": 15, "egitim": 20, "dil": 10, "sertifika": 15}, "olumsuz", f"neg{i}",
+            )
+
+        sonuc, hata = yeniden_egit()
+
+        assert hata is None
+        assert sonuc is not None
+        assert abs(sum(sonuc.values()) - 1.0) < 1e-6
+        assert models.ScoringConfig.query.count() == 1
+        assert models.ScoringConfig.query.first().ornek_sayisi == 50
