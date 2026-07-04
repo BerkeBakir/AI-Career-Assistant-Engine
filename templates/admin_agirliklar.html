@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">⚙️ Skorlama Ağırlıkları</h2>
+
+    <div class="card shadow-sm border-0 p-4 mb-4">
+        <h5 class="mb-3">Mevcut Ağırlıklar</h5>
+        <table class="table table-sm">
+            <tr><td>Teknik</td><td>{{ "%.2f"|format(agirliklar.teknik) }}</td></tr>
+            <tr><td>Deneyim</td><td>{{ "%.2f"|format(agirliklar.deneyim) }}</td></tr>
+            <tr><td>Eğitim</td><td>{{ "%.2f"|format(agirliklar.egitim) }}</td></tr>
+            <tr><td>Dil</td><td>{{ "%.2f"|format(agirliklar.dil) }}</td></tr>
+            <tr><td>Sertifika</td><td>{{ "%.2f"|format(agirliklar.sertifika) }}</td></tr>
+        </table>
+    </div>
+
+    <div class="card shadow-sm border-0 p-4">
+        <h5 class="mb-3">Geri Bildirim Durumu</h5>
+        <p>Toplam: <strong>{{ toplam }}</strong> / Gereken: <strong>{{ esik }}</strong></p>
+        <p>👍 Olumlu: <strong>{{ olumlu }}</strong> &nbsp; 👎 Olumsuz: <strong>{{ olumsuz }}</strong></p>
+
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">Ağırlıkları Yeniden Eğit</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -119,6 +119,7 @@ def login():
         if user and check_password_hash(user.parola, parola):
             session.permanent = True
             session['user_id'] = user.id
+            session['rol'] = user.rol
             logger.info(f"Kullanici girisi: {email}")
             return redirect(url_for('panel'))
         else:
@@ -383,6 +384,37 @@ def _tek_ilan_analiz_et(ilan_id, cv_id, cv_verisi, user_id):
     except Exception as e:
         logger.error(f"Paralel analiz hatası (ilan_id={ilan_id}): {e}")
         return {'ilan_id': ilan_id, 'success': False, 'error': str(e)}
+
+@app.route('/admin/agirliklar', methods=['GET', 'POST'])
+def admin_agirliklar():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    kullanici = models.Kullanici.query.get(session['user_id'])
+    if not kullanici or kullanici.rol != 'admin':
+        return "Bu islemi yapmaya yetkiniz yok!", 403
+
+    if request.method == 'POST':
+        yeni_agirliklar, hata = learning.reweighting.yeniden_egit()
+        if hata:
+            flash(hata, 'warning')
+        else:
+            flash(f"Ağırlıklar güncellendi: {yeni_agirliklar}", 'success')
+        return redirect(url_for('admin_agirliklar'))
+
+    mevcut_agirliklar = learning.reweighting.guncel_agirliklari_al() or learning.reweighting.VARSAYILAN_AGIRLIKLAR
+    toplam_geribildirim = models.Geribildirim.query.count()
+    olumlu_sayisi = models.Geribildirim.query.filter_by(deger='olumlu').count()
+    olumsuz_sayisi = models.Geribildirim.query.filter_by(deger='olumsuz').count()
+
+    return render_template(
+        'admin_agirliklar.html',
+        agirliklar=mevcut_agirliklar,
+        toplam=toplam_geribildirim,
+        olumlu=olumlu_sayisi,
+        olumsuz=olumsuz_sayisi,
+        esik=learning.reweighting.MIN_TOPLAM_ORNEK,
+    )
 
 @app.route('/toplu-analiz', methods=['POST'])
 def toplu_analiz():
