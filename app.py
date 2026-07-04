@@ -307,6 +307,31 @@ def tekil_analiz(ilan_id, cv_id):
 
     return redirect(url_for('kaydedilenler'))
 
+@app.route('/geribildirim/<int:eslesme_id>', methods=['POST'])
+def geribildirim_ver(eslesme_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Oturum gerekli'}), 401
+
+    user_id = session['user_id']
+    eslesme = models.Eslesme.query.get_or_404(eslesme_id)
+    if eslesme.cv.aday_id != user_id:
+        abort(403)
+
+    veri = request.get_json(silent=True) or {}
+    deger = veri.get('deger')
+    if deger not in ('olumlu', 'olumsuz'):
+        return jsonify({'error': 'Gecersiz deger'}), 400
+
+    kayit = models.Geribildirim.query.filter_by(eslesme_id=eslesme_id, kullanici_id=user_id).first()
+    if kayit:
+        kayit.deger = deger
+    else:
+        kayit = models.Geribildirim(eslesme_id=eslesme_id, kullanici_id=user_id, deger=deger)
+        db.session.add(kayit)
+    db.session.commit()
+
+    return jsonify({'success': True, 'deger': deger})
+
 def _tek_ilan_analiz_et(ilan_id, cv_id, cv_verisi, user_id):
     """Tek bir ilanı analiz eder (paralel çalışma için)"""
     try:
@@ -397,6 +422,8 @@ def too_large(e):
 
 @app.errorhandler(403)
 def forbidden(e):
+    if request.path.startswith('/geribildirim/'):
+        return jsonify({'error': 'Bu islemi yapmaya yetkiniz yok'}), 403
     flash('Bu islemi yapmaya yetkiniz yok!', 'danger')
     return redirect(url_for('panel'))
 
