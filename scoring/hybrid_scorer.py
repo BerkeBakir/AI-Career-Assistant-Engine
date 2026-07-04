@@ -1,4 +1,4 @@
-from scoring import gemini_client, deterministic
+from scoring import llm_client, deterministic
 
 AGIRLIKLAR = {
     "teknik": 0.40,
@@ -15,14 +15,14 @@ def ilani_karsilastir_hibrit(cv_verisi, ilan_metni, agirliklar=None):
     if not ilan_metni or len(ilan_metni) < 50:
         ilan_metni = "İlan içeriğine tam erişilemedi. Başlık ve şirket bilgisine göre genel değerlendirme yap."
 
-    gereksinimler, hata = gemini_client.gereksinimleri_cikar(ilan_metni)
+    gereksinimler, hata = llm_client.gereksinimleri_cikar(ilan_metni)
     if hata:
         return None, hata
 
     teknik_puan, eslesen_yetenekler, eksik_yetenekler = deterministic.teknik_puani_hesapla(
         cv_verisi.get('yetenekler', []),
         gereksinimler.get('gereken_yetenekler', []),
-        gemini_client._gemini_gomlemesi_al,
+        llm_client._llm_gomlemesi_al,
     )
 
     deneyim_puan, deneyim_uyumu = deterministic.deneyim_puani_hesapla(
@@ -48,7 +48,7 @@ def ilani_karsilastir_hibrit(cv_verisi, ilan_metni, agirliklar=None):
         "sertifika": sertifika_puan,
     }
 
-    egitim_sonuc, hata = gemini_client.egitim_ve_anlatim_uret(
+    egitim_sonuc, hata = llm_client.egitim_ve_anlatim_uret(
         cv_verisi, gereksinimler, alt_puanlar_kismi, eslesen_yetenekler, eksik_yetenekler,
         deneyim_uyumu, dil_uyumu,
     )

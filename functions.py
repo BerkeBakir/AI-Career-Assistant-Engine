@@ -12,39 +12,46 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # API anahtarini environment variable'dan al
-API_KEY = os.getenv('GEMINI_API_KEY')
+API_KEY = os.getenv('OPENAI_API_KEY')
 if not API_KEY:
-    logging.warning("GEMINI_API_KEY environment variable bulunamadi!")
+    logging.warning("OPENAI_API_KEY environment variable bulunamadi!")
 
 # Logging yapilandirmasi
 logger = logging.getLogger(__name__)
 
-def _gemini_istegi_gonder(icerik, talimat, sema, temperature=0.3):
+def _llm_istegi_gonder(icerik, talimat, sema, temperature=0.3):
     modeller = [
-        "gemini-2.0-flash",
-        "gemini-2.5-flash",
-        "gemini-2.0-flash-lite"
+        "gpt-4o-mini",
+        "gpt-4.1-mini",
+        "gpt-4o"
     ]
 
+    sistem_talimati = (
+        f"{talimat}\n\nYanıtı SADECE aşağıdaki JSON şemasına uygun bir JSON nesnesi "
+        f"olarak ver, başka hiçbir metin ekleme:\n{json.dumps(sema, ensure_ascii=False)}"
+    )
     payload = {
-        "systemInstruction": {"parts": [{"text": talimat}]},
-        "contents": [{"parts": [{"text": icerik}]}],
-        "generationConfig": {
-            "responseMimeType": "application/json",
-            "responseSchema": sema,
-            "temperature": temperature
-        }
+        "messages": [
+            {"role": "system", "content": sistem_talimati},
+            {"role": "user", "content": icerik},
+        ],
+        "response_format": {"type": "json_object"},
+        "temperature": temperature,
     }
 
     son_hata = ""
 
     for model in modeller:
         try:
-            api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={API_KEY}"
-            response = requests.post(api_url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
-            
+            api_url = "https://api.openai.com/v1/chat/completions"
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {API_KEY}',
+            }
+            response = requests.post(api_url, headers=headers, data=json.dumps({**payload, "model": model}))
+
             if response.status_code == 200:
-                raw_text = response.json().get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '{}')
+                raw_text = response.json().get('choices', [{}])[0].get('message', {}).get('content', '{}')
                 if "```json" in raw_text:
                     raw_text = raw_text.replace("```json", "").replace("```", "")
                 elif "```" in raw_text:
@@ -126,7 +133,7 @@ def bilgileri_cikar(metin):
 - Sertifikalar: Varsa tüm sertifikaları, kursları, eğitimleri ekle
 - Projeler: Kişisel veya iş projelerini ve kullanılan teknolojileri çıkar"""
 
-    return _gemini_istegi_gonder(metin, talimat, istenen_json_semasi)
+    return _llm_istegi_gonder(metin, talimat, istenen_json_semasi)
 
 def url_den_ilan_cek(url):
     try:

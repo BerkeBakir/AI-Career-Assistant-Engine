@@ -7,7 +7,7 @@ def test_agirliklar_toplami_bir():
     assert abs(sum(AGIRLIKLAR.values()) - 1.0) < 1e-9
 
 
-@patch("scoring.hybrid_scorer.gemini_client")
+@patch("scoring.hybrid_scorer.llm_client")
 @patch("scoring.hybrid_scorer.deterministic")
 def test_ilani_karsilastir_hibrit_agirlikli_ortalama_hesaplar(mock_det, mock_gc):
     mock_gc.gereksinimleri_cikar.return_value = ({
@@ -47,7 +47,7 @@ def test_ilani_karsilastir_hibrit_agirlikli_ortalama_hesaplar(mock_det, mock_gc)
     assert sonuc["guclu_yonler"] == ["Python"]
 
 
-@patch("scoring.hybrid_scorer.gemini_client")
+@patch("scoring.hybrid_scorer.llm_client")
 def test_ilani_karsilastir_hibrit_gereksinim_hatasi_propagates(mock_gc):
     mock_gc.gereksinimleri_cikar.return_value = (None, "API hatası")
     sonuc, hata = ilani_karsilastir_hibrit(
@@ -57,7 +57,7 @@ def test_ilani_karsilastir_hibrit_gereksinim_hatasi_propagates(mock_gc):
     assert hata == "API hatası"
 
 
-@patch("scoring.hybrid_scorer.gemini_client")
+@patch("scoring.hybrid_scorer.llm_client")
 @patch("scoring.hybrid_scorer.deterministic")
 def test_ilani_karsilastir_hibrit_anlatim_hatasi_propagates(mock_det, mock_gc):
     mock_gc.gereksinimleri_cikar.return_value = ({
@@ -77,7 +77,7 @@ def test_ilani_karsilastir_hibrit_anlatim_hatasi_propagates(mock_det, mock_gc):
     assert hata == "Anlatim hatasi"
 
 
-@patch("scoring.hybrid_scorer.gemini_client")
+@patch("scoring.hybrid_scorer.llm_client")
 @patch("scoring.hybrid_scorer.deterministic")
 def test_ilani_karsilastir_hibrit_uses_custom_agirliklar_when_given(mock_det, mock_gc):
     mock_gc.gereksinimleri_cikar.return_value = ({
@@ -104,7 +104,7 @@ def test_ilani_karsilastir_hibrit_uses_custom_agirliklar_when_given(mock_det, mo
     assert sonuc["uygunluk_skoru"] == 100
 
 
-@patch("scoring.hybrid_scorer.gemini_client")
+@patch("scoring.hybrid_scorer.llm_client")
 @patch("scoring.hybrid_scorer.deterministic")
 def test_ilani_karsilastir_hibrit_defaults_to_module_agirliklar_when_none(mock_det, mock_gc):
     mock_gc.gereksinimleri_cikar.return_value = ({

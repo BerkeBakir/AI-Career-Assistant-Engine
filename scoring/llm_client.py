@@ -3,35 +3,30 @@ import logging
 
 import requests
 
-from functions import API_KEY, _gemini_istegi_gonder
+from functions import API_KEY, _llm_istegi_gonder
 
 logger = logging.getLogger(__name__)
 
-EMBEDDING_MODEL = "text-embedding-004"
+EMBEDDING_MODEL = "text-embedding-3-small"
 
 
-def _gemini_gomlemesi_al(metin):
+def _llm_gomlemesi_al(metin):
     if not metin or not metin.strip():
         return None
     try:
-        api_url = (
-            f"https://generativelanguage.googleapis.com/v1beta/models/"
-            f"{EMBEDDING_MODEL}:embedContent?key={API_KEY}"
-        )
-        payload = {
-            "model": f"models/{EMBEDDING_MODEL}",
-            "content": {"parts": [{"text": metin}]},
-        }
         response = requests.post(
-            api_url,
-            headers={'Content-Type': 'application/json'},
-            data=json.dumps(payload),
+            "https://api.openai.com/v1/embeddings",
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {API_KEY}',
+            },
+            data=json.dumps({"model": EMBEDDING_MODEL, "input": metin}),
             timeout=10,
         )
         if response.status_code != 200:
             logger.warning(f"Embedding istegi basarisiz: {response.status_code}")
             return None
-        return response.json().get('embedding', {}).get('values')
+        return response.json().get('data', [{}])[0].get('embedding')
     except requests.RequestException as e:
         logger.warning(f"Embedding istegi hata: {e}")
         return None
@@ -69,7 +64,7 @@ Kurallar:
 - dil_gereksinimleri: Her istenen dil için {dil, min_seviye} (min_seviye: Başlangıç/Orta/İleri/Ana dil)
 - sertifika_gereksinimleri: İstenen sertifikaları listele (belirtilmemişse boş liste)"""
 
-    return _gemini_istegi_gonder(ilan_metni, talimat, sema, temperature=0.1)
+    return _llm_istegi_gonder(ilan_metni, talimat, sema, temperature=0.1)
 
 
 def egitim_ve_anlatim_uret(
@@ -112,4 +107,4 @@ EKSİK YETENEKLER: {eksik_yetenekler}
 DENEYİM UYUMU: {deneyim_uyumu}
 DİL UYUMU: {dil_uyumu}"""
 
-    return _gemini_istegi_gonder(prompt, talimat, sema, temperature=0.3)
+    return _llm_istegi_gonder(prompt, talimat, sema, temperature=0.3)

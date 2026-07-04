@@ -1,12 +1,12 @@
 # AI Career Assistant Engine 🚀
 
-An intelligent, full-stack career platform that automates the job search lifecycle. By leveraging **Generative AI (Google Gemini)** and advanced web scraping, this application transforms how candidates find and apply for jobs—moving from manual searching to AI-driven "point-and-click" matching.
+An intelligent, full-stack career platform that automates the job search lifecycle. By leveraging **Generative AI (OpenAI)** and advanced web scraping, this application transforms how candidates find and apply for jobs—moving from manual searching to AI-driven "point-and-click" matching.
 
 ## 🏛️ System Architecture
 The platform is built on a modular **Flask** backend with a focus on high-performance parallel processing and sophisticated AI integration.
 
 ### Core Engineering Features:
-- **AI-Powered CV Parsing:** Uses **Google Gemini LLM** to perform Named Entity Recognition (NER) on PDF/DOCX files, extracting structured JSON data (Skills, Experience, Education) with high accuracy.
+- **AI-Powered CV Parsing:** Uses **OpenAI's GPT models** to perform Named Entity Recognition (NER) on PDF/DOCX files, extracting structured JSON data (Skills, Experience, Education) with high accuracy.
 - **Distributed Meta-Search Engine:** A modular `scrapers/` package (one file per source) runs concurrently via `ThreadPoolExecutor` with per-source timeouts, aggregating LinkedIn, Indeed, Bing, Arbeitnow, Remotive, Himalayas, FindWork.dev, RemoteOK, WeWorkRemotely, Yenibiris.com, Eleman.net, and (optionally, with a free API key) Jooble. Kariyer.net (PerimeterX bot protection) and SecretCV.com (login-gated listing pages) cannot be scraped directly and fall back to DuckDuckGo `site:` discovery, which is lower-coverage and clearly labeled as such in the code (`scrapers/ddg_fallback.py`).
 - **Semantic Match Scoring:** Beyond keyword matching, the engine performs a deep semantic analysis of job descriptions vs. CV data, generating a 0-100 suitability score across five dimensions (Technical, Experience, Education, Language, and Certifications).[cite: 6, 16]
 - **Automated Cover Letter Generation:** Generates professional, HTML-formatted cover letters tailored specifically to each job listing and candidate profile.[cite: 6, 19]
@@ -20,7 +20,7 @@ The platform is built on a modular **Flask** backend with a focus on high-perfor
 
 ## 🛠️ Tech Stack
 - **Backend:** Python 3.x, Flask (Web Framework)[cite: 1]
-- **AI/LLM:** Google Gemini API (Generative AI)[cite: 6, 9]
+- **AI/LLM:** OpenAI API (GPT-4o-mini/4.1-mini/4o, text-embedding-3-small)[cite: 6, 9]
 - **Database:** SQLite with SQLAlchemy ORM[cite: 1, 8]
 - **Scraping:** BeautifulSoup4, DuckDuckGo Search (DDGS), Requests
 - **File Processing:** PyMuPDF (PDF), python-docx (DOCX)
