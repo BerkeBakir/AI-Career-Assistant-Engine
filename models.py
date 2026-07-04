@@ -35,3 +35,26 @@ class Eslesme(db.Model):
     is_ilani_id = db.Column(db.Integer, db.ForeignKey('is_ilani.id'), nullable=False)
     skor = db.Column(db.Integer, nullable=False)
     analiz_sonucu = db.Column(db.JSON, nullable=True)
+
+
+class Geribildirim(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    eslesme_id = db.Column(db.Integer, db.ForeignKey('eslesme.id'), nullable=False)
+    kullanici_id = db.Column(db.Integer, db.ForeignKey('kullanici.id'), nullable=False)
+    deger = db.Column(db.String(10), nullable=False)  # 'olumlu' veya 'olumsuz'
+    olusturulma_tarihi = db.Column(db.DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        db.UniqueConstraint('eslesme_id', 'kullanici_id', name='uq_geribildirim_eslesme_kullanici'),
+    )
+
+
+class ScoringConfig(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    teknik = db.Column(db.Float, nullable=False)
+    deneyim = db.Column(db.Float, nullable=False)
+    egitim = db.Column(db.Float, nullable=False)
+    dil = db.Column(db.Float, nullable=False)
+    sertifika = db.Column(db.Float, nullable=False)
+    ornek_sayisi = db.Column(db.Integer, nullable=False)
+    olusturulma_tarihi = db.Column(db.DateTime, default=datetime.utcnow)
