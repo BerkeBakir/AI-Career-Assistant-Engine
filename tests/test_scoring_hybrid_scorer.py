@@ -75,3 +75,56 @@ def test_ilani_karsilastir_hibrit_anlatim_hatasi_propagates(mock_det, mock_gc):
     )
     assert sonuc is None
     assert hata == "Anlatim hatasi"
+
+
+@patch("scoring.hybrid_scorer.gemini_client")
+@patch("scoring.hybrid_scorer.deterministic")
+def test_ilani_karsilastir_hibrit_uses_custom_agirliklar_when_given(mock_det, mock_gc):
+    mock_gc.gereksinimleri_cikar.return_value = ({
+        "gereken_yetenekler": [], "min_deneyim_yili": None, "egitim_gereksinimi": "",
+        "dil_gereksinimleri": [], "sertifika_gereksinimleri": [],
+    }, None)
+    mock_det.teknik_puani_hesapla.return_value = (100, [], [])
+    mock_det.deneyim_puani_hesapla.return_value = (0, "")
+    mock_det.dil_puani_hesapla.return_value = (0, "")
+    mock_det.sertifika_puani_hesapla.return_value = 0
+    mock_gc.egitim_ve_anlatim_uret.return_value = ({
+        "egitim_puan": 0, "egitim_uyumu": "", "uygunluk_nedeni": "",
+        "guclu_yonler": [], "gelistirilmesi_gerekenler": [], "tavsiyeler": [],
+    }, None)
+
+    ozel_agirliklar = {"teknik": 1.0, "deneyim": 0.0, "egitim": 0.0, "dil": 0.0, "sertifika": 0.0}
+
+    sonuc, hata = ilani_karsilastir_hibrit(
+        {}, "Yeterince uzun bir iş ilanı metni buraya gelir, elli karakterden uzun olmalı.",
+        agirliklar=ozel_agirliklar,
+    )
+
+    assert hata is None
+    assert sonuc["uygunluk_skoru"] == 100
+
+
+@patch("scoring.hybrid_scorer.gemini_client")
+@patch("scoring.hybrid_scorer.deterministic")
+def test_ilani_karsilastir_hibrit_defaults_to_module_agirliklar_when_none(mock_det, mock_gc):
+    mock_gc.gereksinimleri_cikar.return_value = ({
+        "gereken_yetenekler": [], "min_deneyim_yili": None, "egitim_gereksinimi": "",
+        "dil_gereksinimleri": [], "sertifika_gereksinimleri": [],
+    }, None)
+    mock_det.teknik_puani_hesapla.return_value = (80, [], [])
+    mock_det.deneyim_puani_hesapla.return_value = (70, "")
+    mock_det.dil_puani_hesapla.return_value = (100, "")
+    mock_det.sertifika_puani_hesapla.return_value = 60
+    mock_gc.egitim_ve_anlatim_uret.return_value = ({
+        "egitim_puan": 90, "egitim_uyumu": "", "uygunluk_nedeni": "",
+        "guclu_yonler": [], "gelistirilmesi_gerekenler": [], "tavsiyeler": [],
+    }, None)
+
+    # agirliklar hic verilmiyor - eski Plan 2 cagri sekli, geriye donuk uyumluluk
+    sonuc, hata = ilani_karsilastir_hibrit(
+        {}, "Yeterince uzun bir iş ilanı metni buraya gelir, elli karakterden uzun olmalı."
+    )
+
+    assert hata is None
+    beklenen_skor = round(80 * 0.40 + 70 * 0.25 + 90 * 0.15 + 100 * 0.10 + 60 * 0.10)
+    assert sonuc["uygunluk_skoru"] == beklenen_skor

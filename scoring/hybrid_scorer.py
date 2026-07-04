@@ -9,7 +9,9 @@ AGIRLIKLAR = {
 }
 
 
-def ilani_karsilastir_hibrit(cv_verisi, ilan_metni):
+def ilani_karsilastir_hibrit(cv_verisi, ilan_metni, agirliklar=None):
+    aktif_agirliklar = agirliklar if agirliklar is not None else AGIRLIKLAR
+
     if not ilan_metni or len(ilan_metni) < 50:
         ilan_metni = "İlan içeriğine tam erişilemedi. Başlık ve şirket bilgisine göre genel değerlendirme yap."
 
@@ -63,7 +65,7 @@ def ilani_karsilastir_hibrit(cv_verisi, ilan_metni):
         "sertifika": sertifika_puan,
     }
 
-    toplam_puan = sum(alt_puanlar[k] * AGIRLIKLAR[k] for k in AGIRLIKLAR)
+    toplam_puan = sum(alt_puanlar[k] * aktif_agirliklar[k] for k in AGIRLIKLAR)
 
     sonuc = {
         "teknik_puan": teknik_puan,
