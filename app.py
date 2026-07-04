@@ -315,7 +315,7 @@ def geribildirim_ver(eslesme_id):
     user_id = session['user_id']
     eslesme = models.Eslesme.query.get_or_404(eslesme_id)
     if eslesme.cv.aday_id != user_id:
-        abort(403)
+        return jsonify({'error': 'Bu islemi yapmaya yetkiniz yok'}), 403
 
     veri = request.get_json(silent=True) or {}
     deger = veri.get('deger')
@@ -422,8 +422,6 @@ def too_large(e):
 
 @app.errorhandler(403)
 def forbidden(e):
-    if request.path.startswith('/geribildirim/'):
-        return jsonify({'error': 'Bu islemi yapmaya yetkiniz yok'}), 403
     flash('Bu islemi yapmaya yetkiniz yok!', 'danger')
     return redirect(url_for('panel'))
 
