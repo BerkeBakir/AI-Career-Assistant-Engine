@@ -259,12 +259,25 @@ def kaydedilenler():
 
     puanlar = {}
     analizler = {}
+    eslesme_idler = {}
     if cvler:
         for e in models.Eslesme.query.filter_by(cv_id=cvler[0].id).all():
             puanlar[e.is_ilani_id] = e.skor
             analizler[e.is_ilani_id] = e.analiz_sonucu
+            eslesme_idler[e.is_ilani_id] = e.id
 
-    return render_template('kaydedilenler.html', ilanlar=ilanlar, puanlar=puanlar, analizler=analizler, cvler=cvler)
+    mevcut_geribildirimler = {}
+    if eslesme_idler:
+        for gb in models.Geribildirim.query.filter(
+            models.Geribildirim.kullanici_id == user_id,
+            models.Geribildirim.eslesme_id.in_(eslesme_idler.values()),
+        ).all():
+            mevcut_geribildirimler[gb.eslesme_id] = gb.deger
+
+    return render_template(
+        'kaydedilenler.html', ilanlar=ilanlar, puanlar=puanlar, analizler=analizler,
+        cvler=cvler, eslesme_idler=eslesme_idler, mevcut_geribildirimler=mevcut_geribildirimler,
+    )
 
 @app.route('/analiz-et/<int:ilan_id>/<int:cv_id>', methods=['POST'])
 def tekil_analiz(ilan_id, cv_id):

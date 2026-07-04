@@ -71,3 +71,38 @@ def test_geribildirim_ver_blocks_non_owner(client):
 def test_geribildirim_ver_requires_login(client):
     resp = client.post('/geribildirim/1', json={'deger': 'olumlu'})
     assert resp.status_code == 401
+
+
+def test_kaydedilenler_shows_feedback_widget_with_existing_state(client):
+    with flask_app.app_context():
+        user = models.Kullanici(email="widget@example.com", parola="hashed")
+        db.session.add(user)
+        db.session.commit()
+        cv = models.CV(orjinal_dosya_adi="x.pdf", aday_id=user.id, cikarilan_veriler={})
+        db.session.add(cv)
+        ilan = models.IsIlani(
+            baslik="Test Ilan", sirket_adi="Acme",
+            kaynak_url="https://example.com/widget1", bulan_kullanici_id=user.id,
+        )
+        db.session.add(ilan)
+        db.session.commit()
+        eslesme = models.Eslesme(
+            cv_id=cv.id, is_ilani_id=ilan.id, skor=80,
+            analiz_sonucu={"alt_puanlar": {"teknik": 80, "deneyim": 70, "egitim": 75, "dil": 100, "sertifika": 60}},
+        )
+        db.session.add(eslesme)
+        db.session.commit()
+        gb = models.Geribildirim(eslesme_id=eslesme.id, kullanici_id=user.id, deger="olumlu")
+        db.session.add(gb)
+        db.session.commit()
+        user_id, eslesme_id = user.id, eslesme.id
+
+    with client.session_transaction() as sess:
+        sess['user_id'] = user_id
+
+    resp = client.get('/kaydedilenler')
+
+    assert resp.status_code == 200
+    body = resp.data.decode('utf-8')
+    assert f'data-eslesme-id="{eslesme_id}"' in body
+    assert 'geribildirim-btn active' in body

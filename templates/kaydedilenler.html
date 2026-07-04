@@ -108,6 +108,14 @@
                                 <span class="badge bg-warning text-dark" title="Sertifika">S:{{ alt.sertifika }}</span>
                             </div>
                             {% endif %}
+                            {% if ilan.id in eslesme_idler %}
+                            {% set eslesme_id = eslesme_idler[ilan.id] %}
+                            {% set mevcut = mevcut_geribildirimler.get(eslesme_id) %}
+                            <div class="d-flex gap-1 mt-1 geribildirim-widget" data-eslesme-id="{{ eslesme_id }}">
+                                <button type="button" class="btn btn-sm btn-outline-success geribildirim-btn {% if mevcut == 'olumlu' %}active{% endif %}" data-deger="olumlu" title="Faydalı">👍</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger geribildirim-btn {% if mevcut == 'olumsuz' %}active{% endif %}" data-deger="olumsuz" title="Faydasız">👎</button>
+                            </div>
+                            {% endif %}
                             {% else %}
                             <div class="text-center text-muted small">Analiz Bekliyor</div>
                             {% endif %}
@@ -205,5 +213,32 @@
                 btn.innerHTML = '<i class="fas fa-bolt me-1"></i> Tümünü Analiz Et';
             });
     }
+
+    document.querySelectorAll('.geribildirim-widget').forEach(function (widget) {
+        const eslesmeId = widget.dataset.eslesmeId;
+        widget.querySelectorAll('.geribildirim-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const deger = btn.dataset.deger;
+                const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+
+                fetch(`/geribildirim/${eslesmeId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ deger: deger })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            widget.querySelectorAll('.geribildirim-btn').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                        }
+                    })
+                    .catch(error => console.error('Geribildirim hatasi:', error));
+            });
+        });
+    });
 </script>
 {% endblock %}
