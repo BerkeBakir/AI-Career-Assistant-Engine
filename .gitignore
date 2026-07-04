@@ -161,3 +161,6 @@ cython_debug/
 
 # Superpowers scratch (progress ledger, task briefs/reports)
 .superpowers/
+
+# Claude Code local tooling (dev server launch config, etc.)
+.claude/
