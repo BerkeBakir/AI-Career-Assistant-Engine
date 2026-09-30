@@ -1,6 +1,8 @@
 # AI Career Assistant Engine 🚀
 
-> Yapay zeka destekli, uçtan uca bir iş arama ve CV↔ilan eşleştirme platformu.
+> AI-powered career platform with multi-source job aggregation and hybrid, explainable CV-job matching.
+
+AI Career Assistant Engine parses PDF/DOCX resumes, aggregates job listings from 11 sources in parallel, and evaluates CV-job compatibility across five dimensions through a hybrid, explainable matching engine. It combines OpenAI-powered structured extraction and semantic embeddings with deterministic scoring for skills, experience, languages, and certifications. The platform also provides skill-gap analysis, career recommendations, tailored cover letters, feedback-driven scoring-weight recalibration, and 117 automated tests.
 
 **Repo:** https://github.com/BerkeBakir/AI-Career-Assistant-Engine
 
@@ -34,7 +36,7 @@ AI burada süsleme değil, **ürünün var olma sebebi**:
 3. **Semantik yetenek eşleştirme:** "React" ile "React.js"in veya "Makine Öğrenmesi" ile "ML"in aynı şey olduğunu embedding tabanlı kosinüs benzerliğiyle anlıyor — düz string eşleşmesi değil.
 4. **Doğal dilde değerlendirme:** Güçlü yönler, geliştirilmesi gerekenler, tavsiyeler ve ön yazı (cover letter) üretimi.
 
-**Kullanılan AI araçları:** OpenAI API (`gpt-4o-mini` → `gpt-4.1-mini` → `gpt-4o` fallback zinciri ile yapılandırılmış JSON üretimi; `text-embedding-3-small` ile semantik embedding). Geliştirme sürecinde **Claude Code (Anthropic)** ajan tabanlı olarak kod yazımı, test-driven development ve kod review için kullanıldı.
+**Kullanılan AI araçları:** OpenAI API (`gpt-4o-mini` → `gpt-4.1-mini` → `gpt-4o` fallback zinciri ile yapılandırılmış JSON üretimi; `text-embedding-3-small` ile semantik embedding).
 
 ## 🎨 Kullanıcı Deneyimi
 
