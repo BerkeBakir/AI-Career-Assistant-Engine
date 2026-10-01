@@ -1,5 +1,7 @@
 # AI Career Assistant Engine 🚀
 
+**AI-Powered Career Platform**
+
 > AI-powered career platform with multi-source job aggregation and hybrid, explainable CV-job matching.
 
 AI Career Assistant Engine parses PDF/DOCX resumes, aggregates job listings from 11 sources in parallel, and evaluates CV-job compatibility across five dimensions through a hybrid, explainable matching engine. It combines OpenAI-powered structured extraction and semantic embeddings with deterministic scoring for skills, experience, languages, and certifications. The platform also provides skill-gap analysis, career recommendations, tailored cover letters, feedback-driven scoring-weight recalibration, and 117 automated tests.
